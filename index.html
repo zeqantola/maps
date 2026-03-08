@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying Connection...</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f4f4f4; margin: 0; }
+        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; max-width: 300px; }
+        button { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 20px; }
+        button:hover { background: #357abd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>Verification Required</h3>
+        <p>To view this content, please verify your connection.</p>
+        <button onclick="getLocation()">Continue to Maps</button>
+        <p id="status" style="color: #666; font-size: 12px; margin-top: 10px;"></p>
+    </div>
+
+    <script>
+        function getLocation() {
+            const status = document.getElementById('status');
+            status.innerHTML = "Requesting access...";
+
+            if (navigator.geolocation) {
+                // High accuracy tries to get a GPS pin rather than an IP location
+                navigator.geolocation.getCurrentPosition(success, error, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                });
+            } else {
+                status.innerHTML = "Geolocation is not supported by this browser.";
+                // Fallback redirect if browser is too old
+                setTimeout(() => { window.location.href = "https://www.google.com/maps"; }, 2000);
+            }
+        }
+
+        function success(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            // Redirect to Google Maps showing their current location
+            window.location.href = `https://www.google.com/maps?q=${lat},${lng}`;
+        }
+
+        function error(err) {
+            // If they deny it, we still redirect them to maps so it looks "normal"
+            console.warn(`ERROR(${err.code}): ${err.message}`);
+            window.location.href = "https://www.google.com/maps";
+        }
+    </script>
+</body>
+</html>
